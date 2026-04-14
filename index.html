@@ -196,6 +196,30 @@
             cursor: pointer; 
         }
 
+        .userhash-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .userhash-group label {
+            font-size: 13px;
+            color: #555;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .userhash-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .userhash-group small {
+            color: #666;
+            font-size: 12px;
+            display: block;
+            margin-top: 4px;
+        }
+
         .music-player { 
             position: fixed; 
             bottom: 25px; 
@@ -233,7 +257,6 @@
         <div class="background-overlay"></div>
     </div>
 
-    <!-- 修改后的跑马灯 -->
     <div class="marquee-container">
         <div class="marquee">
             <a href="https://kelayun.notepin.co" target="_blank">白嫖就是如此简单</a>
@@ -245,6 +268,14 @@
         <img class="avatar-img" src="https://i.imgant.com/v2/xxKwQwD.jpeg" alt="Eternity">
 
         <div class="glass-card">
+            
+            <!-- UserHash 输入框（已插入） -->
+            <div class="userhash-group">
+                <label>🔑 Catbox UserHash（必填）</label>
+                <input type="text" id="userHashInput" placeholder="在此粘贴你的 userhash" value="">
+                <small>登录 <a href="https://catbox.moe/user/manage.php" target="_blank" style="color:#4a6cf7;">https://catbox.moe/user/manage.php</a> 复制 userhash</small>
+            </div>
+
             <div id="uploadForm">
                 <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
                     <div style="font-size: 48px; margin-bottom: 12px;">📤</div>
@@ -290,7 +321,7 @@
     <audio id="bgMusic" loop preload="auto" src="https://mpimg.cn/view.php/ac863e4b37bd7eb8388e97f15aed64dc.mp3"></audio>
 
     <script>
-        // 音乐控制
+        // ==================== 音乐控制 ====================
         const bgMusic = document.getElementById('bgMusic');
         const musicToggle = document.getElementById('musicToggle');
 
@@ -311,21 +342,22 @@
 
         window.addEventListener('load', () => {
             setTimeout(tryPlayMusic, 800);
+            // 加载保存的 userhash
+            const savedHash = localStorage.getItem('catboxUserHash');
+            if (savedHash) {
+                document.getElementById('userHashInput').value = savedHash;
+            }
         });
 
-        // 上传功能
+        // ==================== 配置 ====================
         const PROXY_GATEWAY = 'https://proxy.api.030101.xyz/';
         const API_URL = 'https://catbox.moe/user/api.php';
-
-        function buildMirrorWithProxy(originalUrl) {
-            if (!originalUrl) return '';
-            let cleanUrl = originalUrl.replace(/^https?:\/\//, '');
-            return PROXY_GATEWAY + cleanUrl;
-        }
+        const CF_PROXY = 'https://proxy.jsnzkpg.uk/?url=';
 
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
 
+        // ==================== 拖拽上传 ====================
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
             dropZone.addEventListener(eventName, e => {
                 e.preventDefault();
@@ -342,12 +374,31 @@
             if (e.target.files.length > 0) handleUpload(e.target.files[0]);
         };
 
+        // ==================== 构建镜像链接 ====================
+        function buildMirrorWithProxy(originalUrl) {
+            if (!originalUrl) return '';
+            let cleanUrl = originalUrl.replace(/^https?:\/\//, '');
+            return PROXY_GATEWAY + cleanUrl;
+        }
+
+        // ==================== 核心上传函数 ====================
         function handleUpload(file) {
             if (file.size > 200 * 1024 * 1024) {
-                alert('文件超过200MB限制！');
+                alert('文件超过 200MB 限制！');
                 return;
             }
 
+            const userHash = document.getElementById('userHashInput').value.trim();
+
+            if (!userHash) {
+                alert('请先填写你的 Catbox UserHash！\n\n去 https://catbox.moe/user/manage.php 登录后复制 userhash');
+                return;
+            }
+
+            // 保存 userhash
+            localStorage.setItem('catboxUserHash', userHash);
+
+            // 显示进度
             document.getElementById('uploadForm').style.display = 'none';
             document.getElementById('progressSection').style.display = 'block';
             document.getElementById('progressBar').style.width = '0%';
@@ -355,10 +406,14 @@
 
             const fd = new FormData();
             fd.append('reqtype', 'fileupload');
+            fd.append('userhash', userHash);     // 关键：使用 userhash
             fd.append('fileToUpload', file);
 
-            const CF_PROXY = 'https://proxy.jsnzkpg.uk/?url=';
-            const targetUrl = CF_PROXY + encodeURIComponent(API_URL);
+            // 代理设置（如果代理失效可把 CF_PROXY 改为空字符串）
+            let targetUrl = API_URL;
+            if (CF_PROXY) {
+                targetUrl = CF_PROXY + encodeURIComponent(API_URL);
+            }
 
             const xhr = new XMLHttpRequest();
             xhr.open('POST', targetUrl, true);
@@ -372,25 +427,26 @@
             };
 
             xhr.onload = () => {
-                if (xhr.status === 200) {
-                    let responseUrl = xhr.responseText.trim();
-                    if (responseUrl.startsWith('http')) {
-                        document.getElementById('rawLink').value = responseUrl;
-                        document.getElementById('proxyLink').value = buildMirrorWithProxy(responseUrl);
-                        document.getElementById('progressSection').style.display = 'none';
-                        document.getElementById('resultSection').style.display = 'block';
-                    } else {
-                        alert('上传失败，服务器返回异常');
-                        location.reload();
-                    }
+                const response = xhr.responseText.trim();
+
+                if (xhr.status === 200 && response.startsWith('http')) {
+                    document.getElementById('rawLink').value = response;
+                    document.getElementById('proxyLink').value = buildMirrorWithProxy(response);
+                    document.getElementById('progressSection').style.display = 'none';
+                    document.getElementById('resultSection').style.display = 'block';
                 } else {
-                    alert('上传失败，请稍后重试');
-                    location.reload();
+                    let errMsg = response || '未知错误 (HTTP ' + xhr.status + ')';
+                    if (errMsg.includes('Anonymous')) {
+                        errMsg = '匿名上传已被禁用！请使用有效的 UserHash。';
+                    }
+                    alert('上传失败：\n' + errMsg);
+                    console.error('Catbox 返回:', response);
+                    setTimeout(() => location.reload(), 2000);
                 }
             };
 
             xhr.onerror = () => {
-                alert('网络错误，请检查网络后重试');
+                alert('网络错误，请检查网络或尝试关闭代理（把 CF_PROXY 改为空）');
                 location.reload();
             };
 
@@ -400,7 +456,6 @@
         function copyValue(id, btn) {
             const input = document.getElementById(id);
             if (!input.value) return;
-            
             navigator.clipboard.writeText(input.value).then(() => {
                 const original = btn.innerText;
                 btn.innerText = '✓ 已复制';
@@ -408,6 +463,7 @@
             });
         }
 
+        // 拖拽样式
         dropZone.addEventListener('dragenter', () => {
             dropZone.style.background = 'rgba(255,255,255,0.4)';
         });
@@ -416,4 +472,4 @@
         });
     </script>
 </body>
-  </html>
+</html>
