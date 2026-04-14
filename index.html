@@ -34,7 +34,7 @@
 
         .main-layer { width: 100%; max-width: 460px; position: relative; z-index: 2; }
 
-        /* 强制纯白色标题，彻底去除任何红色 */
+        /* 强制纯白色标题 */
         .page-title {
             text-align: center; 
             font-size: 31px; 
@@ -61,10 +61,9 @@
             text-align: center; 
         }
 
-        /* 拖拽框稍微缩小 */
         .upload-zone {
             border-radius: 14px; 
-            padding: 18px 15px;   /* 进一步缩小 */
+            padding: 18px 15px; 
             cursor: pointer;
             background: rgba(255, 255, 255, 0.28); 
             margin-bottom: 18px; 
@@ -100,8 +99,8 @@
         .music-btn {
             width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.4);
             backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.5);
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 24px;
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 24px;
         }
         .music-btn.playing { animation: spin 4s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -132,7 +131,6 @@
                 <button class="btn" onclick="document.getElementById('fileInput').click()">立即上传文件</button>
             </div>
 
-            <!-- 进度和结果部分保持不变 -->
             <div id="progressSection">
                 <p style="font-size: 14px; font-weight: bold;">🚀 正在同步至云端...</p>
                 <div class="progress-bar"><div class="progress-fill" id="progressBar"></div></div>
@@ -159,7 +157,7 @@
     <audio id="bgMusic" loop src="https://files.catbox.moe/89l1hc.flac"></audio>
 
     <script>
-        // 樱花雨（保持逼真效果）
+        // 樱花雨保持不变（逼真版）
         const canvas = document.getElementById('sakuraCanvas');
         const ctx = canvas.getContext('2d');
         let width, height;
