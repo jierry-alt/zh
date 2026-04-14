@@ -6,8 +6,8 @@
     <title>Eternity直连托管</title>
     <style>
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.18);
-            --glass-border: rgba(255, 255, 255, 0.25);
+            --glass-bg: rgba(255, 255, 255, 0.22);
+            --glass-border: rgba(255, 255, 255, 0.35);
             --accent-color: #e80860;
         }
 
@@ -22,35 +22,32 @@
             overflow-x: hidden;
             padding: 15px; 
             padding-top: 6vh;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); /* 紫蓝渐变 */
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             position: relative;
         }
 
-        /* 樱花雨 Canvas - 放在最底层 */
         #sakuraCanvas {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: -1;
             pointer-events: none;
         }
 
         .main-layer { 
             width: 100%; 
-            max-width: 450px; 
+            max-width: 460px; 
             position: relative; 
             z-index: 2;
         }
 
         .page-title {
             text-align: center; 
-            font-size: 30px; 
-            font-weight: 800; 
-            margin-bottom: 10px;
-            color: rgba(255, 255, 255, 0.85);
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            font-size: 32px; 
+            font-weight: 900; 
+            margin-bottom: 12px;
+            color: #ffffff;
+            text-shadow: 0 3px 15px rgba(0, 0, 0, 0.25);
         }
 
         .avatar-img {
@@ -59,27 +56,27 @@
             border-radius: 50%; 
             object-fit: cover;
             display: block; 
-            margin: 0 auto 15px; 
-            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-            border: 3px solid rgba(255,255,255,0.7);
+            margin: 0 auto 18px; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 4px solid rgba(255,255,255,0.75);
         }
 
         .glass-card {
             background: var(--glass-bg); 
-            backdrop-filter: blur(20px); 
-            border-radius: 16px; 
+            backdrop-filter: blur(24px); 
+            border-radius: 20px; 
             border: 1px solid var(--glass-border); 
-            padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); 
+            padding: 28px 22px;
+            box-shadow: 0 12px 45px rgba(0, 0, 0, 0.18); 
             text-align: center; 
         }
 
         .upload-zone {
-            border-radius: 12px; 
-            padding: 25px 15px; 
+            border-radius: 14px; 
+            padding: 28px 15px; 
             cursor: pointer;
-            background: rgba(255, 255, 255, 0.22); 
-            margin-bottom: 18px; 
+            background: rgba(255, 255, 255, 0.28); 
+            margin-bottom: 20px; 
             transition: 0.3s;
             border: 2px dashed var(--glass-border);
         }
@@ -88,55 +85,55 @@
             display: flex; 
             flex-wrap: wrap; 
             justify-content: center; 
-            gap: 5px; 
-            margin: 15px 0;
+            gap: 6px; 
+            margin: 16px 0;
         }
         .tag {
-            font-size: 9.5px; 
-            background: rgba(255,255,255,0.45); 
+            font-size: 10px; 
+            background: rgba(255,255,255,0.6); 
             color: #e80860;
-            padding: 3px 7px; 
-            border-radius: 4px; 
-            font-weight: bold; 
+            padding: 4px 9px; 
+            border-radius: 6px; 
+            font-weight: 600;
         }
 
         .upload-info-text { 
-            font-size: 14px; 
+            font-size: 15px; 
             font-weight: 600; 
-            color: #333; 
-            margin-bottom: 10px; 
+            color: #222; 
+            margin-bottom: 12px; 
         }
 
         .btn {
             background: var(--accent-color); 
             color: white; 
             border: none; 
-            padding: 13px;
-            border-radius: 8px; 
+            padding: 14px;
+            border-radius: 10px; 
             cursor: pointer; 
-            font-weight: 600; 
+            font-weight: 700; 
             width: 100%; 
-            transition: 0.3s;
+            font-size: 16px;
         }
 
-        #progressSection, #resultSection { display: none; margin-top: 15px; }
-        .progress-bar { background: rgba(0,0,0,0.1); height: 8px; border-radius: 4px; overflow: hidden; margin: 12px 0; }
-        .progress-fill { width: 0%; height: 100%; background: var(--accent-color); transition: 0.2s; }
+        #progressSection, #resultSection { display: none; margin-top: 18px; }
+        .progress-bar { background: rgba(0,0,0,0.12); height: 8px; border-radius: 4px; overflow: hidden; margin: 12px 0; }
+        .progress-fill { width: 0%; height: 100%; background: var(--accent-color); transition: 0.3s; }
 
         .input-group {
             display: flex; 
-            background: rgba(255,255,255,0.5); 
+            background: rgba(255,255,255,0.65); 
             border: 1px solid var(--glass-border); 
-            border-radius: 8px; 
-            padding: 5px; 
-            margin-top: 10px;
+            border-radius: 10px; 
+            padding: 6px; 
+            margin-top: 12px;
         }
         .input-group input { 
             flex: 1; 
             background: transparent; 
             border: none; 
-            padding: 9px; 
-            font-size: 13.5px; 
+            padding: 10px; 
+            font-size: 14px; 
             outline: none; 
             color: #222;
         }
@@ -144,38 +141,37 @@
             background: var(--accent-color); 
             color: white; 
             border: none; 
-            padding: 0 16px; 
-            border-radius: 6px; 
+            padding: 0 18px; 
+            border-radius: 8px; 
             cursor: pointer; 
         }
 
         .music-player { 
             position: fixed; 
-            bottom: 30px; 
+            bottom: 35px; 
             right: 25px; 
-            z-index: 999; 
+            z-index: 10; 
         }
         .music-btn {
-            width: 48px; 
-            height: 48px; 
+            width: 50px; 
+            height: 50px; 
             border-radius: 50%; 
-            background: rgba(255,255,255,0.35);
-            backdrop-filter: blur(10px); 
-            border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255,255,255,0.5);
             display: flex; 
             align-items: center; 
             justify-content: center; 
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
-            font-size: 22px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+            font-size: 24px;
         }
-        .music-btn.playing { animation: spin 3.8s linear infinite; }
+        .music-btn.playing { animation: spin 4s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body onclick="handleFirstClick()">
 
-    <!-- 樱花雨 Canvas -->
     <canvas id="sakuraCanvas"></canvas>
 
     <div class="main-layer">
@@ -193,7 +189,7 @@
                         <span class="tag">ZIP</span><span class="tag">7Z</span><span class="tag">RAR</span><span class="tag">TAR</span><span class="tag">GZ</span><span class="tag">ISO</span><span class="tag">DMG</span>
                         <span class="tag">APK</span><span class="tag">IPA</span><span class="tag">EXE</span><span class="tag">PDF</span><span class="tag">TXT</span><span class="tag">JSON</span><span class="tag">XML</span><span class="tag">DOCX</span>
                     </div>
-                    <p style="font-size: 11px; color: #555;">☁️ 永久储存 · 📦 256MB内 · ⚡ 智能直链</p>
+                    <p style="font-size: 11.5px; color: #444; margin-top: 8px;">☁️ 永久储存 · 📦 256MB内 · ⚡ 智能直链</p>
                     <input type="file" id="fileInput" hidden>
                 </div>
                 <button class="btn" onclick="document.getElementById('fileInput').click()">立即上传文件</button>
@@ -207,13 +203,13 @@
 
             <div id="resultSection">
                 <div style="text-align: left;">
-                    <span style="font-size: 12px; font-weight: bold; color: #666;">✅ 复制链接导入软件会自动识别：比如m3u,txt</span>
+                    <span style="font-size: 12px; font-weight: bold; color: #555;">✅ 复制链接导入软件会自动识别</span>
                     <div class="input-group">
                         <input type="text" id="rawLink" readonly>
                         <button class="btn-copy" onclick="copyValue('rawLink', this)">复制</button>
                     </div>
                 </div>
-                <p style="font-size: 11px; color: #999; margin-top: 15px;">关注TG频道：https://t.me/stymei</p>
+                <p style="font-size: 11px; color: #888; margin-top: 18px;">关注TG频道：https://t.me/stymei</p>
                 <button class="btn" style="background:none; border:1px solid #e80860; color:#e80860; margin-top: 15px;" onclick="location.reload()">继续上传</button>
             </div>
         </div>
@@ -225,11 +221,11 @@
     <audio id="bgMusic" loop src="https://files.catbox.moe/89l1hc.flac"></audio>
 
     <script>
-        // ==================== 樱花雨效果 ====================
+        // ==================== 更逼真的樱花瓣（Bezier曲线绘制） ====================
         const canvas = document.getElementById('sakuraCanvas');
         const ctx = canvas.getContext('2d');
-
         let width, height;
+
         function resizeCanvas() {
             width = window.innerWidth;
             height = window.innerHeight;
@@ -240,56 +236,65 @@
         resizeCanvas();
 
         class Petal {
-            constructor() {
-                this.reset();
-            }
+            constructor() { this.reset(); }
             reset() {
                 this.x = Math.random() * width;
-                this.y = Math.random() * -height;
-                this.size = Math.random() * 12 + 8;
-                this.speed = Math.random() * 2.5 + 1.5;
+                this.y = Math.random() * -height * 0.7;
+                this.size = Math.random() * 11 + 7;
+                this.speed = Math.random() * 1.5 + 0.8;        // 保持缓慢
                 this.angle = Math.random() * Math.PI * 2;
-                this.angleSpeed = Math.random() * 0.05 - 0.025;
-                this.opacity = Math.random() * 0.6 + 0.4;
-                this.swing = Math.random() * 30 + 15;
-                this.swingSpeed = Math.random() * 0.03 + 0.015;
+                this.angleSpeed = Math.random() * 0.035 - 0.017;
+                this.opacity = Math.random() * 0.7 + 0.45;
+                this.swing = Math.random() * 25 + 10;
+                this.swingSpeed = Math.random() * 0.025 + 0.01;
+                this.rotationOffset = Math.random() * Math.PI; // 额外旋转偏移让形态更自然
             }
             update() {
                 this.y += this.speed;
                 this.angle += this.angleSpeed;
                 this.x += Math.sin(this.angle) * this.swingSpeed * this.swing;
-
-                if (this.y > height + 20) this.reset();
+                if (this.y > height + 40) this.reset();
             }
             draw() {
                 ctx.save();
                 ctx.globalAlpha = this.opacity;
                 ctx.translate(this.x, this.y);
-                ctx.rotate(this.angle);
+                ctx.rotate(this.angle + this.rotationOffset);
+
+                // 更逼真的樱花瓣 - 使用贝塞尔曲线
                 ctx.fillStyle = '#ff99cc';
+                ctx.strokeStyle = '#ff77aa';
+                ctx.lineWidth = 0.8;
+
                 ctx.beginPath();
-                ctx.ellipse(0, 0, this.size / 2, this.size / 1.6, 0, 0, Math.PI * 2);
+                ctx.moveTo(0, -this.size * 0.9);
+                // 上半部曲线（心形感）
+                ctx.bezierCurveTo(-this.size * 0.55, -this.size * 0.4, -this.size * 0.7, this.size * 0.2, 0, this.size * 0.75);
+                ctx.bezierCurveTo(this.size * 0.7, this.size * 0.2, this.size * 0.55, -this.size * 0.4, 0, -this.size * 0.9);
+                ctx.closePath();
                 ctx.fill();
+                ctx.stroke();
+
                 ctx.restore();
             }
         }
 
         const petals = [];
-        for (let i = 0; i < 80; i++) {   // 数量可调整，80左右效果较好
+        for (let i = 0; i < 95; i++) {
             petals.push(new Petal());
         }
 
         function animateSakura() {
             ctx.clearRect(0, 0, width, height);
-            petals.forEach(petal => {
-                petal.update();
-                petal.draw();
+            petals.forEach(p => {
+                p.update();
+                p.draw();
             });
             requestAnimationFrame(animateSakura);
         }
         animateSakura();
 
-        // ==================== 其他原有功能 ====================
+        // ==================== 音乐与上传功能（保持不变） ====================
         const bgMusic = document.getElementById('bgMusic');
         const musicBtn = document.getElementById('musicBtn');
         let hasInteracted = false;
@@ -299,7 +304,7 @@
                 bgMusic.play().then(() => {
                     musicBtn.classList.add('playing');
                     hasInteracted = true;
-                }).catch(e => console.log("播放被拦截"));
+                }).catch(() => {});
             }
         }
 
@@ -317,7 +322,7 @@
         const fileInput = document.getElementById('fileInput');
         const WORKER_URL = 'https://cloud.jsnzkpg.ccwu.cc/upload';
 
-        fileInput.onchange = async (e) => {
+        fileInput.onchange = (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
