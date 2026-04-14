@@ -4,15 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Eternity 永久直链托管</title>
-    <script>
-        var _hmt = _hmt || [];
-        (function() {
-          var hm = document.createElement("script");
-          hm.src = "https://hm.baidu.com/hm.js?f463aebe70bb41d3370a497b28a6d7ac";
-          var s = document.getElementsByTagName("script")[0]; 
-          s.parentNode.insertBefore(hm, s);
-        })();
-    </script>
     <style>
         :root {
             --glass-bg: rgba(255, 255, 255, 0.15);
@@ -220,6 +211,15 @@
             margin-top: 4px;
         }
 
+        .proxy-group {
+            margin: 15px 0;
+            text-align: left;
+        }
+        .proxy-group label {
+            font-size: 13px;
+            color: #555;
+        }
+
         .music-player { 
             position: fixed; 
             bottom: 25px; 
@@ -269,11 +269,19 @@
 
         <div class="glass-card">
             
-            <!-- UserHash 输入框（已插入） -->
+            <!-- UserHash 输入框 -->
             <div class="userhash-group">
                 <label>🔑 Catbox UserHash（必填）</label>
                 <input type="text" id="userHashInput" placeholder="在此粘贴你的 userhash" value="">
                 <small>登录 <a href="https://catbox.moe/user/manage.php" target="_blank" style="color:#4a6cf7;">https://catbox.moe/user/manage.php</a> 复制 userhash</small>
+            </div>
+
+            <!-- 新增：代理开关 -->
+            <div class="proxy-group">
+                <label>
+                    <input type="checkbox" id="useProxy" checked> 
+                    使用 CORS 代理（推荐在中国大陆网络下勾选）
+                </label>
             </div>
 
             <div id="uploadForm">
@@ -321,7 +329,7 @@
     <audio id="bgMusic" loop preload="auto" src="https://mpimg.cn/view.php/ac863e4b37bd7eb8388e97f15aed64dc.mp3"></audio>
 
     <script>
-        // ==================== 音乐控制 ====================
+        // 音乐控制
         const bgMusic = document.getElementById('bgMusic');
         const musicToggle = document.getElementById('musicToggle');
 
@@ -342,27 +350,27 @@
 
         window.addEventListener('load', () => {
             setTimeout(tryPlayMusic, 800);
-            // 加载保存的 userhash
             const savedHash = localStorage.getItem('catboxUserHash');
-            if (savedHash) {
-                document.getElementById('userHashInput').value = savedHash;
-            }
+            if (savedHash) document.getElementById('userHashInput').value = savedHash;
         });
 
         // ==================== 配置 ====================
-        const PROXY_GATEWAY = 'https://proxy.api.030101.xyz/';
         const API_URL = 'https://catbox.moe/user/api.php';
-        const CF_PROXY = 'https://proxy.jsnzkpg.uk/?url=';
+        const PROXY_GATEWAY = 'https://proxy.api.030101.xyz/';   // 你的镜像加速保持不变
+
+        const CORS_PROXIES = [
+            'https://corsproxy.io/?',           // 新换的主代理（推荐）
+            'https://proxy.corsfix.com/?'       // 备用
+        ];
+
+        let currentProxyIndex = 0;
 
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
 
-        // ==================== 拖拽上传 ====================
+        // 拖拽支持
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, e => {
-                e.preventDefault();
-                e.stopPropagation();
-            });
+            dropZone.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); });
         });
 
         dropZone.addEventListener('drop', (e) => {
@@ -374,14 +382,13 @@
             if (e.target.files.length > 0) handleUpload(e.target.files[0]);
         };
 
-        // ==================== 构建镜像链接 ====================
         function buildMirrorWithProxy(originalUrl) {
             if (!originalUrl) return '';
             let cleanUrl = originalUrl.replace(/^https?:\/\//, '');
             return PROXY_GATEWAY + cleanUrl;
         }
 
-        // ==================== 核心上传函数 ====================
+        // ==================== 上传核心函数 ====================
         function handleUpload(file) {
             if (file.size > 200 * 1024 * 1024) {
                 alert('文件超过 200MB 限制！');
@@ -389,16 +396,14 @@
             }
 
             const userHash = document.getElementById('userHashInput').value.trim();
-
             if (!userHash) {
-                alert('请先填写你的 Catbox UserHash！\n\n去 https://catbox.moe/user/manage.php 登录后复制 userhash');
+                alert('请先填写你的 Catbox UserHash！');
                 return;
             }
-
-            // 保存 userhash
             localStorage.setItem('catboxUserHash', userHash);
 
-            // 显示进度
+            const useProxy = document.getElementById('useProxy').checked;
+
             document.getElementById('uploadForm').style.display = 'none';
             document.getElementById('progressSection').style.display = 'block';
             document.getElementById('progressBar').style.width = '0%';
@@ -406,13 +411,15 @@
 
             const fd = new FormData();
             fd.append('reqtype', 'fileupload');
-            fd.append('userhash', userHash);     // 关键：使用 userhash
+            fd.append('userhash', userHash);
             fd.append('fileToUpload', file);
 
-            // 代理设置（如果代理失效可把 CF_PROXY 改为空字符串）
             let targetUrl = API_URL;
-            if (CF_PROXY) {
-                targetUrl = CF_PROXY + encodeURIComponent(API_URL);
+
+            if (useProxy) {
+                const proxy = CORS_PROXIES[currentProxyIndex];
+                targetUrl = proxy + encodeURIComponent(API_URL);
+                console.log('使用代理:', proxy);
             }
 
             const xhr = new XMLHttpRequest();
@@ -435,41 +442,13 @@
                     document.getElementById('progressSection').style.display = 'none';
                     document.getElementById('resultSection').style.display = 'block';
                 } else {
-                    let errMsg = response || '未知错误 (HTTP ' + xhr.status + ')';
-                    if (errMsg.includes('Anonymous')) {
-                        errMsg = '匿名上传已被禁用！请使用有效的 UserHash。';
-                    }
-                    alert('上传失败：\n' + errMsg);
-                    console.error('Catbox 返回:', response);
-                    setTimeout(() => location.reload(), 2000);
+                    let errMsg = response || `HTTP ${xhr.status}`;
+                    if (errMsg.includes('Anonymous')) errMsg = '匿名上传已被禁用，请确认 UserHash 正确！';
+                    alert('上传失败：\n' + errMsg + '\n\n如果一直失败，请尝试关闭“使用 CORS 代理”开关后重试');
+                    console.error('返回内容:', response);
+                    setTimeout(() => location.reload(), 2500);
                 }
             };
 
             xhr.onerror = () => {
-                alert('网络错误，请检查网络或尝试关闭代理（把 CF_PROXY 改为空）');
-                location.reload();
-            };
-
-            xhr.send(fd);
-        }
-
-        function copyValue(id, btn) {
-            const input = document.getElementById(id);
-            if (!input.value) return;
-            navigator.clipboard.writeText(input.value).then(() => {
-                const original = btn.innerText;
-                btn.innerText = '✓ 已复制';
-                setTimeout(() => btn.innerText = original, 1500);
-            });
-        }
-
-        // 拖拽样式
-        dropZone.addEventListener('dragenter', () => {
-            dropZone.style.background = 'rgba(255,255,255,0.4)';
-        });
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.style.background = 'rgba(255,255,255,0.25)';
-        });
-    </script>
-</body>
-</html>
+                alert('网络请求失败。\n\n建议：关闭“使用 CORS 代理”开关试试（如果你
