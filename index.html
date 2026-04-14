@@ -46,13 +46,14 @@
         @keyframes gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
         .avatar-img {
-            width: 92px; 
-            height: 92px; 
+            width: 96px; 
+            height: 96px; 
             border-radius: 50%; 
             object-fit: cover;
             display: block; 
             margin: 0 auto 15px; 
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+            border: 3px solid rgba(255,255,255,0.6);
         }
 
         .glass-card {
@@ -176,8 +177,8 @@
 
     <div class="main-layer">
         <div class="page-title">Eternity直连托管</div>
-        <!-- 卡通猫咪头像 -->
-        <img class="avatar-img" src="https://i.imgur.com/5z3kJ8P.png" alt="Eternity Cat">
+        <!-- 新卡通猫咪头像 -->
+        <img class="avatar-img" src="https://i.imgur.com/0Z8vK8P.png" alt="Eternity Cat">
 
         <div class="glass-card">
             <div id="uploadForm">
@@ -247,4 +248,47 @@
         };
 
         const fileInput = document.getElementById('fileInput');
-        const WORKER_URL = 'https://cloud.jsnzkpg
+        const WORKER_URL = 'https://cloud.jsnzkpg.ccwu.cc/upload';
+
+        fileInput.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            document.getElementById('uploadForm').style.display = 'none';
+            document.getElementById('progressSection').style.display = 'block';
+
+            const fd = new FormData();
+            fd.append('files[]', file);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', WORKER_URL, true);
+
+            xhr.upload.onprogress = (ev) => {
+                const percent = Math.round((ev.loaded / ev.total) * 100);
+                document.getElementById('progressBar').style.width = percent + '%';
+                document.getElementById('percentText').innerText = `上传进度：${percent}%`;
+            };
+
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    document.getElementById('rawLink').value = xhr.responseText.trim();
+                    document.getElementById('progressSection').style.display = 'none';
+                    document.getElementById('resultSection').style.display = 'block';
+                } else {
+                    alert('上传失败');
+                    location.reload();
+                }
+            };
+            xhr.send(fd);
+        };
+
+        function copyValue(id, btn) {
+            const input = document.getElementById(id);
+            navigator.clipboard.writeText(input.value).then(() => {
+                btn.innerText = '已复制';
+                setTimeout(() => btn.innerText = '复制', 1500);
+            });
+        }
+    </script>
+</body>
+</html>
