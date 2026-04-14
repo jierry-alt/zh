@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Eternity直连托管</title>
     <style>
         :root {
@@ -21,26 +24,17 @@
             overflow-x: hidden;
             padding: 15px; 
             padding-top: 6vh;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); /* 保留紫蓝渐变背景 */
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             position: relative;
         }
 
         #sakuraCanvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1;
-            pointer-events: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
         }
 
-        .main-layer { 
-            width: 100%; 
-            max-width: 460px; 
-            position: relative; 
-            z-index: 2;
-        }
+        .main-layer { width: 100%; max-width: 460px; position: relative; z-index: 2; }
 
-        /* 彻底隐藏红色 - 强制纯白色 */
+        /* 强制纯白色标题，彻底去除任何红色 */
         .page-title {
             text-align: center; 
             font-size: 31px; 
@@ -51,12 +45,8 @@
         }
 
         .avatar-img {
-            width: 96px; 
-            height: 96px; 
-            border-radius: 50%; 
-            object-fit: cover;
-            display: block; 
-            margin: 0 auto 18px; 
+            width: 96px; height: 96px; border-radius: 50%; object-fit: cover;
+            display: block; margin: 0 auto 18px; 
             box-shadow: 0 8px 25px rgba(0,0,0,0.3);
             border: 4px solid rgba(255,255,255,0.75);
         }
@@ -74,7 +64,7 @@
         /* 拖拽框稍微缩小 */
         .upload-zone {
             border-radius: 14px; 
-            padding: 20px 15px;        /* 上下内边距减小 */
+            padding: 18px 15px;   /* 进一步缩小 */
             cursor: pointer;
             background: rgba(255, 255, 255, 0.28); 
             margin-bottom: 18px; 
@@ -82,39 +72,17 @@
             border: 2px dashed var(--glass-border);
         }
 
-        .format-list {
-            display: flex; 
-            flex-wrap: wrap; 
-            justify-content: center; 
-            gap: 6px; 
-            margin: 14px 0;
-        }
+        .format-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 14px 0; }
         .tag {
-            font-size: 10px; 
-            background: rgba(255,255,255,0.6); 
-            color: #e80860;
-            padding: 4px 9px; 
-            border-radius: 6px; 
-            font-weight: 600;
+            font-size: 10px; background: rgba(255,255,255,0.6); color: #e80860;
+            padding: 4px 9px; border-radius: 6px; font-weight: 600;
         }
 
-        .upload-info-text { 
-            font-size: 14.5px; 
-            font-weight: 600; 
-            color: #222; 
-            margin-bottom: 10px; 
-        }
+        .upload-info-text { font-size: 14.5px; font-weight: 600; color: #222; margin-bottom: 10px; }
 
         .btn {
-            background: var(--accent-color); 
-            color: white; 
-            border: none; 
-            padding: 14px;
-            border-radius: 10px; 
-            cursor: pointer; 
-            font-weight: 700; 
-            width: 100%; 
-            font-size: 16px;
+            background: var(--accent-color); color: white; border: none; padding: 14px;
+            border-radius: 10px; cursor: pointer; font-weight: 700; width: 100%; font-size: 16px;
         }
 
         #progressSection, #resultSection { display: none; margin-top: 18px; }
@@ -122,50 +90,18 @@
         .progress-fill { width: 0%; height: 100%; background: var(--accent-color); transition: 0.3s; }
 
         .input-group {
-            display: flex; 
-            background: rgba(255,255,255,0.65); 
-            border: 1px solid var(--glass-border); 
-            border-radius: 10px; 
-            padding: 6px; 
-            margin-top: 12px;
+            display: flex; background: rgba(255,255,255,0.65); border: 1px solid var(--glass-border); 
+            border-radius: 10px; padding: 6px; margin-top: 12px;
         }
-        .input-group input { 
-            flex: 1; 
-            background: transparent; 
-            border: none; 
-            padding: 10px; 
-            font-size: 14px; 
-            outline: none; 
-            color: #222;
-        }
-        .btn-copy { 
-            background: var(--accent-color); 
-            color: white; 
-            border: none; 
-            padding: 0 18px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-        }
+        .input-group input { flex: 1; background: transparent; border: none; padding: 10px; font-size: 14px; outline: none; color: #222; }
+        .btn-copy { background: var(--accent-color); color: white; border: none; padding: 0 18px; border-radius: 8px; cursor: pointer; }
 
-        .music-player { 
-            position: fixed; 
-            bottom: 35px; 
-            right: 25px; 
-            z-index: 10; 
-        }
+        .music-player { position: fixed; bottom: 35px; right: 25px; z-index: 10; }
         .music-btn {
-            width: 50px; 
-            height: 50px; 
-            border-radius: 50%; 
-            background: rgba(255,255,255,0.4);
-            backdrop-filter: blur(12px); 
-            border: 1px solid rgba(255,255,255,0.5);
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
-            font-size: 24px;
+            width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.5);
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 24px;
         }
         .music-btn.playing { animation: spin 4s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -196,6 +132,7 @@
                 <button class="btn" onclick="document.getElementById('fileInput').click()">立即上传文件</button>
             </div>
 
+            <!-- 进度和结果部分保持不变 -->
             <div id="progressSection">
                 <p style="font-size: 14px; font-weight: bold;">🚀 正在同步至云端...</p>
                 <div class="progress-bar"><div class="progress-fill" id="progressBar"></div></div>
@@ -222,7 +159,7 @@
     <audio id="bgMusic" loop src="https://files.catbox.moe/89l1hc.flac"></audio>
 
     <script>
-        // 樱花雨（保持你喜欢的细腻逼真效果）
+        // 樱花雨（保持逼真效果）
         const canvas = document.getElementById('sakuraCanvas');
         const ctx = canvas.getContext('2d');
         let width, height;
@@ -273,7 +210,6 @@
                 ctx.closePath();
                 ctx.fill();
                 ctx.stroke();
-
                 ctx.restore();
             }
         }
@@ -288,28 +224,23 @@
         }
         animateSakura();
 
-        // 音乐与上传
+        // 音乐与上传（不变）
         const bgMusic = document.getElementById('bgMusic');
         const musicBtn = document.getElementById('musicBtn');
         let hasInteracted = false;
 
         function handleFirstClick() {
             if (!hasInteracted) {
-                bgMusic.play().then(() => {
-                    musicBtn.classList.add('playing');
-                    hasInteracted = true;
-                }).catch(() => {});
+                bgMusic.play().then(() => { musicBtn.classList.add('playing'); hasInteracted = true; }).catch(() => {});
             }
         }
 
         musicBtn.onclick = (e) => {
             e.stopPropagation();
             if (bgMusic.paused) {
-                bgMusic.play();
-                musicBtn.classList.add('playing');
+                bgMusic.play(); musicBtn.classList.add('playing');
             } else {
-                bgMusic.pause();
-                musicBtn.classList.remove('playing');
+                bgMusic.pause(); musicBtn.classList.remove('playing');
             }
         };
 
@@ -319,7 +250,6 @@
         fileInput.onchange = (e) => {
             const file = e.target.files[0];
             if (!file) return;
-
             document.getElementById('uploadForm').style.display = 'none';
             document.getElementById('progressSection').style.display = 'block';
 
